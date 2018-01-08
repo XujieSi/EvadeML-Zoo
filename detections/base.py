@@ -13,6 +13,7 @@ from sklearn.metrics import roc_curve, auc
 from .feature_squeezing import FeatureSqueezingDetector
 from .magnet_mnist import MagNetDetector as MagNetDetectorMNIST
 from .magnet_cifar import MagNetDetector as MagNetDetectorCIFAR
+from .rand_noise import RandNoiseDetector
 
 from tensorflow.python.platform import flags
 FLAGS = flags.FLAGS
@@ -230,6 +231,8 @@ class DetectionEvaluator:
                 detector = MagNetDetectorMNIST(model, detector_name)
             elif self.dataset_name == "CIFAR-10":
                 detector = MagNetDetectorCIFAR(model, detector_name)
+        elif detector_name.startswith('RandNoise'):
+            detector = RandNoiseDetector(model, detector_name)
 
         return detector
 
@@ -250,6 +253,7 @@ class DetectionEvaluator:
                 print ("Skipped an unknown detector [%s]" % detector_name.split('?')[0])
                 continue
             detector.train(X_train, Y_train)
+            #print("Y_test", Y_test)
             Y_test_pred, Y_test_pred_score = detector.test(X_test)
 
             accuracy, tpr, fpr, tp, ap = evalulate_detection_test(Y_test, Y_test_pred)
