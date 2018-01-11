@@ -282,6 +282,7 @@ def main(argv=None):
     # 6. Evaluate robust classification techniques.
     # Example: --robustness \
     #           "Base;FeatureSqueezing?squeezer=bit_depth_1;FeatureSqueezing?squeezer=median_filter_2;"
+    '''
     if FLAGS.robustness != '':
         """
         Test the accuracy with robust classifiers.
@@ -293,7 +294,8 @@ def main(argv=None):
         evaluate_robustness(FLAGS.robustness, model, Y_test_all, X_test_all, Y_test, \
                 attack_string_list, X_test_adv_discretized_list, 
                 fname_prefix, selected_idx_vis, result_folder_robustness)
-
+    '''
+    
 
     # 7. Detection experiment.
     # Example: --detection "FeatureSqueezing?distance_measure=l1&squeezers=median_smoothing_2,bit_depth_4,bilateral_filter_15_15_60;"

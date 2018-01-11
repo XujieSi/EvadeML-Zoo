@@ -236,6 +236,7 @@ class DetectionEvaluator:
 
         return detector
 
+
     def evaluate_detections(self, params_str):
         X_train, Y_train, X_test, Y_test = self.get_training_testing_data()
 
@@ -253,7 +254,8 @@ class DetectionEvaluator:
                 print ("Skipped an unknown detector [%s]" % detector_name.split('?')[0])
                 continue
             detector.train(X_train, Y_train)
-            #print("Y_test", Y_test)
+            
+            #print("Y_test (%d)" % len(Y_test), Y_test)
             Y_test_pred, Y_test_pred_score = detector.test(X_test)
 
             accuracy, tpr, fpr, tp, ap = evalulate_detection_test(Y_test, Y_test_pred)
@@ -262,6 +264,8 @@ class DetectionEvaluator:
 
             print ("Detector: %s" % detector_name)
             print ("Accuracy: %f\tTPR: %f\tFPR: %f\tROC-AUC: %f" % (accuracy, tpr, fpr, roc_auc))
+
+
 
             rec = {}
             rec['detector'] = detector_name
@@ -272,6 +276,8 @@ class DetectionEvaluator:
             rec['fpr'] = fpr
             overall_detection_rate_saes = 0
             nb_saes = 0
+
+            print("\n\n **** start measure attacks ****** \n\n\n")
             for attack_name in self.attack_names:
                 # No adversarial examples for training for the current detection methods.
                 # X_sae, Y_sae = self.get_sae_testing_data(attack_name)
@@ -281,16 +287,18 @@ class DetectionEvaluator:
                     X_sae, Y_sae = self.get_sae_data(attack_name)
                 Y_test_pred, Y_test_pred_score = detector.test(X_sae)
                 _, tpr, _, tp, ap = evalulate_detection_test(Y_sae, Y_test_pred)
-                print ("Detection rate on SAEs: %.4f \t %3d/%3d \t %s" % (tpr, tp, ap, attack_name))
+                print ("Detection rate on: %.4f \t %3d/%3d \t %s" % (tpr, tp, ap, attack_name))
                 overall_detection_rate_saes += tpr * len(Y_sae)
                 nb_saes += len(Y_sae)
                 rec[attack_name] = tpr
                 # print ("overall_detection_rate_saes/nb_saes: %d/%d" % (overall_detection_rate_saes, nb_saes))
 
-            print ("Overall detection rate on SAEs: %f (%d/%d)" % (overall_detection_rate_saes/nb_saes, overall_detection_rate_saes, nb_saes))
+            print ("Overall detection rate: %f (%d/%d)" % (overall_detection_rate_saes/nb_saes, overall_detection_rate_saes, nb_saes))
             rec['overall'] = float(overall_detection_rate_saes/nb_saes)
             to_csv.append(rec)
 
+
+            '''
             # No adversarial examples for training for the current detection methods.
             # X_sae_all, Y_sae_all = self.get_sae_testing_data()
             print ("### Excluding FAEs:")
@@ -317,5 +325,6 @@ class DetectionEvaluator:
             Y_test_pred, Y_test_pred_score = detector.test(X_fae)
             _, tpr, _, tp, ap = evalulate_detection_test(Y_fae, Y_test_pred)
             print ("Overall detection rate on FAEs: %.4f \t %3d/%3d" % (tpr, tp, ap))
+            '''
 
         write_to_csv(to_csv, csv_fpath, fieldnames)

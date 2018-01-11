@@ -46,7 +46,7 @@ class RandNoiseDetector:
             is_adv.append( ct[majority] / len(labels) )
 
         #print("is_adv:", is_adv)
-        res = np.array([ 0 if x > 0.97 else 1 for x in is_adv ] )
+        res = np.array([ 0 if x > 0.99 else 1 for x in is_adv ] )
         #print("res:", res)
-        return res,res
+        return res,is_adv
 
